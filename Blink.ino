@@ -34,39 +34,27 @@ void setup() {
  byte cmd[MAX_BTCMDLEN];
  int uartCmdLen = 0;
  int trick = 0 ;
+ int turnAnchor = 0 ;
 void runMoter(){
     digitalWrite(12, HIGH);   
-    delay(5000);            
-    digitalWrite(12, LOW);   
-    delay(5000);
+    delay(100);            
   }
+void backMoter(){
+    digitalWrite(12, LOW);   
+    delay(100);            
+  }  
 void turnRight(){
-  delay(300);
-    for(int i = 1000; i <= 2000; i+=100){
-      myservo.writeMicroseconds(i);
-      delay(300);
-    }
+     if (turnAnchor <=2000){
+        myservo.writeMicroseconds(turnAnchor+200);
+        delay(100);
+     }
   }
 void turnLeft(){
-  delay(300);  
-    for(int i = 2000; i >= 1000; i-=100){
-      myservo.writeMicroseconds(i);
-      delay(300);
+    if(turnAnchor >= 1000){
+      myservo.writeMicroseconds(turnAnchor-200);
+      delay(100);
     } 
   }
-void listenCmd(){
-  while(trick < MAX_BTCMDLEN){
-    if ((insize =(BTSerial.available()))>0){
-        for(ii=0; ii<insize; ii++){
-           cmd[(len++)%MAX_BTCMDLEN]=char(BTSerial.read());
-        }
-     }
-     else{
-       trick++;
-     }
-     delay(5);
-  }
-}
 void listenCommand(){
   char *p;
    char key = 0;
@@ -80,14 +68,31 @@ void listenCommand(){
    Serial.println(key);
    switch(key){
      case 'a':
-       runMoter();
+          runMoter();
       break;
      case 'r':
          turnRight();
       break;
      case 'l':
          turnLeft();
-       break;
+      break;
+     case 'ar':
+         runMoter();
+         turnRight();
+      break;
+     case 'al':
+         runMoter();
+         turnLeft();
+      break;
+     case 'b':
+         backMoter();
+     case 'bl':
+         backMoter();
+         turnLeft();
+     case 'br':
+         backMoter();
+         turnRight();
+     break;
    }
 }
 void loop() {
